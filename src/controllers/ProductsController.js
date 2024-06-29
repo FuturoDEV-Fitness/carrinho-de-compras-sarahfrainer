@@ -1,5 +1,3 @@
-// Implemente os métodos de cada rota dentro do arquivo ProductController.js
-
 const { Pool } = require('pg');
 
 const conexao = new Pool({
@@ -22,7 +20,7 @@ class ProductsController {
                 });
             }
 
-            // Execute a query para inserir o cliente
+            // Execute a query para inserir o produto
             const product = await conexao.query(`
                 INSERT INTO products
                 (name, amount, color, voltage, description, category_id)
@@ -30,18 +28,35 @@ class ProductsController {
                 RETURNING *
             `, [dados.name, dados.amount, dados.color, dados.voltage, dados.description, dados.category_id]);
 
-
-
             // Verifique se foi inserido com sucesso
             if (product.rows.length > 0) {
                 return response.status(201).json(product.rows[0]);
             } else {
-                throw new Error('Falha ao inserir o cliente');
+                throw new Error('Falha ao inserir o produto');
             }
         } catch (error) {
-            console.error('Erro ao cadastrar o cliente:', error.message);
+            console.error('Erro ao cadastrar o produto:', error.message);
             return response.status(500).json({
-                mensagem: 'Houve um erro ao cadastrar o cliente'
+                mensagem: 'Houve um erro ao cadastrar o produto'
+            });
+        }
+    }
+
+    async listarTodos(request, response) {
+        try {
+            const result = await conexao.query(`
+                SELECT * FROM products
+            `);
+
+            if (result.rows.length > 0) {
+                return response.status(200).json(result.rows);
+            } else {
+                return response.status(404).json({ mensagem: 'Nenhum produto encontrado' });
+            }
+        } catch (error) {
+            console.error('Erro ao listar os produtos:', error.message);
+            return response.status(500).json({
+                mensagem: 'Houve um erro ao listar os produtos'
             });
         }
     }

@@ -1,6 +1,10 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const productsRoutes = require('./products.routes');
+
+const productsRoutes = require('./routes/products.routes');
+const clientsRoutes = require('./routes/clients.routes');
+const ordersRoutes = require('./routes/orders.routes');
+
 
 const app = express();
 
@@ -8,7 +12,9 @@ const app = express();
 app.use(bodyParser.json());
 
 // Middleware para usar as rotas de produtos
-app.use('/api/products', productsRoutes);
+app.use('/products', productsRoutes);
+app.use('/clients', clientsRoutes);
+app.use('/orders', ordersRoutes);
 
 // Middleware para tratamento de erros de JSON malformado
 app.use((err, req, res, next) => {

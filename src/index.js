@@ -1,15 +1,25 @@
-const express = require("express")
+const express = require('express');
+const bodyParser = require('body-parser');
+const productsRoutes = require('./products.routes');
 
-const clientsRoutes = require('./routes/clients.routes')
-const productsRoutes = require('./routes/products.routes')
+const app = express();
 
-const app = express()
-app.use(express.json()) // Habilita o servidor a receber JSON
+// Configurando body-parser para analisar JSON
+app.use(bodyParser.json());
 
-app.use('/clients', clientsRoutes);
-app.use('/products', productsRoutes);
+// Middleware para usar as rotas de produtos
+app.use('/api/products', productsRoutes);
 
+// Middleware para tratamento de erros de JSON malformado
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({ mensagem: 'JSON malformado' });
+  }
+  next();
+});
 
-app.listen(3000, () => {
-    console.log("Servidor Online")
-})
+// Iniciar o servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});

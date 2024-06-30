@@ -60,6 +60,44 @@ class ProductsController {
             });
         }
     }
-}
+
+    //Implemente no arquivo products.routes.js uma rota para listar um produto com detalhes (use join para os relacionamentos com a categoria)
+
+    async ProdutoComDetalhes(request, response) {
+        try {
+            const id = request.params.id;
+    
+            const produto = await conexao.query(`
+                SELECT 
+                    p.id, 
+                    p.name, 
+                    p.amount, 
+                    p.color, 
+                    p.voltage, 
+                    p.description, 
+                    c.id as category_id, 
+                    c.name as category_name 
+                FROM products p
+                INNER JOIN categories c ON p.category_id = c.id
+                WHERE p.id = $1
+            `, [id]);
+    
+            if (produto.rows.length === 0) {
+                return response.status(404).json({
+                    mensagem: 'Não foi encontrado um produto com esse id'
+                });
+            }
+    
+            response.json(produto.rows[0]);
+        } catch (error) {
+            response.status(500).json({
+                mensagem: 'Houve um erro ao listar o produto'
+            });
+        }
+    }
+    
+    
+    }
+
 
 module.exports = new ProductsController();
